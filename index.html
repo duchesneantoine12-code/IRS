@@ -332,7 +332,7 @@ let user=null,mine=null,R={tab:"home",id:null},pending=false,ED=null,q="",flt={}
 const _n=new Date();let cal={y:_n.getFullYear(),m:_n.getMonth(),wk:0,view:"month",sel:null};
 const myLogin=()=>String((user&&user.email)||"").split("@")[0];
 const name=()=>(mine&&mine.name)||myLogin()||"Agent";
-const EMAIL=l=>String(l||"").trim().toLowerCase().replace(/[^a-z0-9._-]/g,"")+"@irs.example.com";
+const EMAIL=l=>{l=String(l||"").trim().toLowerCase();return l.includes("@")?l:l.replace(/[^a-z0-9._-]/g,"")+"@irs.example.com"};
 const isDir=()=>!!mine&&mine.role==="directeur";
 const canTeam=()=>!!mine&&(mine.role==="directeur"||mine.role==="co-directeur");
 const cn=id=>(D.citizens.find(c=>c.id===id)||{name:"(supprimé)"}).name;
