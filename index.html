@@ -289,7 +289,7 @@ details.addbox{margin-top:12px;border-top:1px dashed var(--bd);padding-top:10px}
 <script src="config.js"></script>
 <script>
 /* ====== À REMPLIR (clé "anon" publique, jamais la service_role) ====== */
-const SUPABASE_URL=(window.IRS_CONFIG||{}).url||"https://XXXX.supabase.co", SUPABASE_ANON_KEY=(window.IRS_CONFIG||{}).key||"XXXX";
+const SUPABASE_URL=String((window.IRS_CONFIG||{}).url||"https://XXXX.supabase.co").trim().replace(/\/(rest|auth)\/v1.*$/,"").replace(/\/+$/,""), SUPABASE_ANON_KEY=String((window.IRS_CONFIG||{}).key||"XXXX").trim();
 /* ===================================================================== */
 const sb=supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
 const $=s=>document.querySelector(s);
