@@ -1,0 +1,34 @@
+<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Test de connexion IRS</title>
+<style>body{font:15px system-ui;background:#0b0f17;color:#e8eef7;max-width:640px;margin:30px auto;padding:0 16px}input,button{font:inherit;padding:10px;border-radius:8px;border:1px solid #334;background:#121826;color:#fff;width:100%;box-sizing:border-box;margin:4px 0 10px}button{background:#2a8bff;border:0;cursor:pointer;font-weight:700}pre{background:#121826;padding:12px;border-radius:8px;white-space:pre-wrap;word-break:break-word}.ok{color:#22f59b}.ko{color:#ff6b81}</style>
+<script src="config.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script></head><body>
+<h2>Test de connexion IRS</h2>
+<p>Tape l'e-mail et le mot de passe du compte, puis clique. La page dit exactement où ça bloque.</p>
+<input id="e" placeholder="e-mail du compte (ex. sam@irs.com)"><input id="p" type="password" placeholder="mot de passe"><button id="b">Tester</button><pre id="o">En attente…</pre>
+<script>
+const o=document.getElementById("o"),L=[];const log=(t,ok)=>{L.push((ok===true?"✅ ":ok===false?"❌ ":"• ")+t);o.textContent=L.join("\n")};
+document.getElementById("b").onclick=async()=>{L.length=0;
+const cfg=window.IRS_CONFIG;
+if(!cfg){return log("config.js introuvable ou vide : le fichier n'est pas en ligne à côté de test.html",false)}
+const url=String(cfg.url||"").trim(),key=String(cfg.key||"").trim();
+log("URL lue : "+url);log("Début de la clé : "+key.slice(0,12)+"… (longueur "+key.length+")");
+if(!/^https:\/\/[a-z0-9]+\.supabase\.co$/.test(url))log("L'URL n'a pas la bonne forme (https://xxxx.supabase.co, sans / final)",false);
+if(!key.startsWith("eyJ"))log("La clé ne commence pas par eyJ : prends la clé « anon public » de l'onglet Legacy",false);
+try{const r=await fetch(url+"/auth/v1/health",{headers:{apikey:key}});log("Serveur Supabase joignable (réponse "+r.status+")",r.ok)}catch(e){return log("Impossible de joindre Supabase : "+e.message+" → l'URL est fausse",false)}
+const sb=supabase.createClient(url,key);
+const email=document.getElementById("e").value.trim().toLowerCase(),pw=document.getElementById("p").value;
+log("E-mail testé : "+email);
+const {data,error}=await sb.auth.signInWithPassword({email,password:pw});
+if(error){log("Connexion refusée : "+error.message+" (code "+(error.code||error.status||"?")+")",false);
+ if(/invalid login/i.test(error.message))log("→ Ce couple e-mail / mot de passe n'existe pas dans Authentication > Users (vérifie l'e-mail exact et retape le mot de passe, ou recrée le compte).");
+ if(/not confirmed/i.test(error.message))log("→ Compte non confirmé : dans Users, ouvre le compte et confirme-le, ou recrée-le avec Auto Confirm User.");
+ if(/api key|jwt/i.test(error.message))log("→ La clé est refusée : utilise la clé anon public de l'onglet Legacy.");return}
+log("Connexion réussie pour "+data.user.email,true);
+const login=email.split("@")[0];
+const s=await sb.from("staff").select("*");
+if(s.error)return log("Lecture de la table staff impossible : "+s.error.message+" (le SQL n'a peut-être pas été lancé, ou le login ne correspond pas)",false);
+log("Lignes visibles dans staff : "+JSON.stringify(s.data));
+if(s.data.some(x=>x.login===login))log("Rôle trouvé pour « "+login+" » : tout est bon, le site doit te laisser entrer.",true);
+else log("Aucune ligne staff avec login = « "+login+" ». Dans Table Editor > staff, mets exactement ça dans la colonne login (avec role = directeur).",false);
+};
+</script></body></html>
