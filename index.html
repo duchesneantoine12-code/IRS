@@ -294,6 +294,7 @@ nav{flex:1;min-height:0;overflow-y:auto;overflow-x:hidden;scrollbar-width:thin;s
 
 button.st.kf{font:inherit;color:inherit;text-align:left;cursor:pointer;width:100%}button.st.kf:hover{filter:brightness(1.15);transform:translateY(-1px)}button.st.kf.act{outline:2px solid var(--ac);outline-offset:1px;background:color-mix(in srgb,var(--ac) 14%,var(--card))}
 .ckcard .tw{overflow-x:visible}@media(max-width:1180px){.ckcard .tw{overflow-x:auto}.ckcard table{min-width:860px}}.ckcard table{table-layout:auto;width:100%}.ckcard td,.ckcard th{white-space:normal;padding:8px 8px;vertical-align:middle}.ckcard th{font-size:10px;letter-spacing:.06em}.ckcard td.n{white-space:nowrap}.ckact{display:flex;flex-wrap:wrap;gap:4px;justify-content:flex-end;max-width:210px;margin-left:auto}.ckact .btn{white-space:nowrap}.ckcard .av{width:28px;height:28px;font-size:11px}.ckcard td:first-child .row{gap:8px}
+#totop{position:fixed;right:20px;bottom:22px;z-index:45;width:46px;height:46px;border-radius:50%;border:1px solid color-mix(in srgb,var(--ac) 60%,#000);background:var(--bt);color:#fff;font-size:22px;font-weight:700;line-height:1;cursor:pointer;box-shadow:0 6px 20px #0006,inset 0 1px 0 #ffffff38;opacity:0;transform:translateY(12px);pointer-events:none;transition:opacity .18s,transform .18s}#totop.show{opacity:1;transform:none;pointer-events:auto}#totop:hover{filter:brightness(1.12)}@media(max-width:820px){#totop{right:14px;bottom:16px;width:42px;height:42px}}@media print{#totop{display:none}}
 /* ===== responsive ===== */
 html,body{max-width:100%;overflow-x:hidden}img,video,canvas{max-width:100%;height:auto}.main,main,.card,.split>*,.lib>*,.homegrid>*,.cols>*{min-width:0}
 .chips{max-width:100%;overflow-x:auto;scrollbar-width:thin}
@@ -975,6 +976,8 @@ let su=await tmp.auth.signUp({email:EMAIL(lg),password:d.pw});
 if(su.error){const si=await tmp.auth.signInWithPassword({email:EMAIL(lg),password:d.pw});if(si.error)return alert("Impossible de créer ce compte : "+su.error.message+" (si l’identifiant a déjà servi, choisis-en un autre).")}
 r=await sb.from("staff").insert({login:lg,name:d.name,role:d.role});if(!fail(r)){fm.reset();toast("Compte créé");await load("staff")}}});
 
+/* retour en haut */
+(function(){try{const b=document.createElement("button");b.id="totop";b.type="button";b.setAttribute("aria-label","Retour en haut");b.title="Retour en haut";b.textContent="↑";b.onclick=()=>window.scrollTo({top:0,behavior:"smooth"});document.body.appendChild(b);const f=()=>b.classList.toggle("show",window.scrollY>300);window.addEventListener("scroll",f,{passive:true});f()}catch(e){}})();
 /* ---------- démarrage ---------- */
 async function boot(){
 const {data:{session}}=await sb.auth.getSession();user=session?.user||null;$("#out").hidden=!user;$("#acc").hidden=!user;
